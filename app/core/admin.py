@@ -1,3 +1,47 @@
-from django.contrib import admin  # noqa
+"""
+Django admin customization.
+"""
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
 
-# Register your models here.
+from core import models
+
+
+class UserAdmin(BaseUserAdmin):
+  """Define the admin pages for users."""
+  ordering = ['id']  # The field that we want to order the users by
+  list_display = ['email', 'name']  # The fields that we want to display on the user list page
+  fieldsets = (  # Fieldsets are used to organize the fields in the admin page
+    (None, {'fields': ('email', 'password')}),  # None is the title of the section (not displayed)
+    (
+      _('Permissions'),
+      {
+        'fields': (
+          'is_active',
+          'is_staff',
+          'is_superuser',
+        )
+      }
+    ),
+    (_('Important dates'), {'fields': ('last_login',)}),
+  )
+  readonly_fields = ['last_login']  # Fields that are read-only
+  add_fieldsets = (  # Add fieldsets are used to organize the fields in the add page
+    (None, {  # None is the title of the section (not displayed)
+      'classes': ('wide',),  # CSS classes to apply to the fieldset
+      # fields are the fields that we want to display on the add page
+      'fields': (
+        'email',
+        'password1',
+        'password2',
+        'name',
+        'is_active',
+        'is_staff',
+        'is_superuser',
+      )
+    }),
+  )
+
+
+admin.site.register(models.User, UserAdmin)
