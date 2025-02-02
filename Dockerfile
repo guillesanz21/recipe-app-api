@@ -4,7 +4,7 @@ LABEL maintainer="guillesanz21"
 
 # Recommended when you run Python in a Docker container. It tells Python that you don't want to buffer the output.
 # The output from Python will be printed directly to the console, which prevents any delays of messages.
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
@@ -31,12 +31,14 @@ RUN python -m venv /py && \
     fi && \
     # Cleaning
     rm -rf /tmp && \
-    apk del .tmp-build-deps
-    # adduser \
-    #     --disabled-password \
-    #     --no-create-home \
-    #     django-user
+    apk del .tmp-build-deps && \
+    adduser \
+        --disabled-password \
+        --no-create-home \
+        django-user
 
 ENV PATH="/py/bin:$PATH"
 
-# USER django-user
+RUN chown -R django-user:django-user /usr/app
+
+USER django-user

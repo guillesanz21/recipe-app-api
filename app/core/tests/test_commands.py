@@ -12,7 +12,7 @@ from django.db.utils import OperationalError
 from django.test import SimpleTestCase
 
 
-# Simulates the "check" method used in the Command class of
+# Mock the "check" method used in the Command class of
 # the wait_for_db command.
 @patch("core.management.commands.wait_for_db.Command.check")
 class CommandTest(SimpleTestCase):
