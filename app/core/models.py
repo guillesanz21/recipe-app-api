@@ -13,32 +13,32 @@ from django.contrib.auth.models import (
 # The BaseUserManager class is a helper class that Django provides that we can use to create a user or superuser
 # It provides some helper functions that make it easier to work with our custom user model
 class UserManager(BaseUserManager):
-  """Manager for user."""
+    """Manager for user."""
 
-  def create_user(self, email, password=None, **extra_fields):
-    """Create, save and return a new user."""
+    def create_user(self, email, password=None, **extra_fields):
+        """Create, save and return a new user."""
 
-    if not email:
-      raise ValueError('Users must have an email address')
+        if not email:
+            raise ValueError('Users must have an email address')
 
-    # self.model is a reference to the model that the manager is for (User)
-    # normalize_email is a helper function that comes with the BaseUserManager
-    # that will normalize the email address (i.e. make the domain part all lower case)
-    user = self.model(email=self.normalize_email(email), **extra_fields)
-    user.set_password(password)  # encrypts the password
-    user.save(using=self._db)  # supports multiple databases
+        # self.model is a reference to the model that the manager is for (User)
+        # normalize_email is a helper function that comes with the BaseUserManager
+        # that will normalize the email address (i.e. make the domain part all lower case)
+        user = self.model(email=self.normalize_email(email), **extra_fields)
+        user.set_password(password)  # encrypts the password
+        user.save(using=self._db)  # supports multiple databases
 
-    return user
+        return user
 
-  def create_superuser(self, email, password):
-    """Create and save a new super"""
+    def create_superuser(self, email, password):
+        """Create and save a new super"""
 
-    user = self.create_user(email, password)
-    user.is_staff = True
-    user.is_superuser = True
-    user.save(using=self._db)
+        user = self.create_user(email, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
 
-    return user
+        return user
 
 
 # The User model is a custom model that we are creating that will inherit from:
@@ -63,18 +63,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Recipe(models.Model):
-  """Recipe object."""
-  user = models.ForeignKey(
-    # This is a reference to the user model that is active in the project.
-    # In theory, we could specify the model with a string, but it would be a magic string
-    settings.AUTH_USER_MODEL,
-    on_delete=models.CASCADE
-  )
-  title = models.CharField(max_length=255)
-  description = models.TextField(blank=True)
-  time_minutes = models.IntegerField()
-  price = models.DecimalField(max_digits=5, decimal_places=2)
-  link = models.CharField(max_length=255, blank=True)
+    """Recipe object."""
+    user = models.ForeignKey(
+        # This is a reference to the user model that is active in the project.
+        # In theory, we could specify the model with a string, but it would be a magic string
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    time_minutes = models.IntegerField()
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    link = models.CharField(max_length=255, blank=True)
 
-  def __str__(self):
-    return self.title
+    def __str__(self):
+        return self.title
