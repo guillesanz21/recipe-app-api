@@ -45,6 +45,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 # ! The mixins provide the actions that can be performed on the view.
 # The order of the mixins is important.
 class TagViewSet(
+        mixins.DestroyModelMixin,
         mixins.UpdateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
