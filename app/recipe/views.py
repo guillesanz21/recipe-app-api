@@ -42,7 +42,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 # * TAG VIEWSET
-class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+# ! The mixins provide the actions that can be performed on the view.
+# The order of the mixins is important.
+class TagViewSet(
+        mixins.UpdateModelMixin,
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
     """Manage tags in the database."""
 
     serializer_class = serializers.TagSerializer
