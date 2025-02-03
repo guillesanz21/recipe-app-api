@@ -11,7 +11,7 @@ from recipe import serializers
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """View por manage recipe APIs."""
-    serializer_class = serializers.RecipeSerializer
+    serializer_class = serializers.RecipeDetailSerializer
     # queryset represents the objects that are available for this ViewSet,
     # since a ViewSet is expected to work with a model.
     queryset = Recipe.objects.all()
@@ -23,3 +23,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Retrieve the recipes for the authenticated user."""
         auth_user = self.request.user  # Retrieve the authenticated user.
         return self.queryset.filter(user=auth_user).order_by('-id')
+
+    # We override the get_serializer_class method to return the appropriate serializer class for the request.
+    # We need different serializers for list and detail views, for example.
+    def get_serializer_class(self):
+        """Return the serializer class for request."""
+        if self.action == 'list':
+            return serializers.RecipeSerializer
+
+        return self.serializer_class
