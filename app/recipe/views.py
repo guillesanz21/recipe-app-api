@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
 from core.models import Recipe, Tag, Ingredient
 from recipe import serializers
@@ -43,9 +44,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def _params_to_ints(self, qs):
         """Convert a list of strings to integers."""
         # "1,2,3" -> [1, 2, 3]
-        return [int(str_id) for str_id in qs.split(",")]
+        # return [int(str_id) for str_id in qs.split(",")]
+        # Raise an error if the string is not a number
+        try:
+            return [int(str_id) for str_id in qs.split(",")]
+            # Return a bad request if the string is not a number.
+        except ValueError:
+            raise ValidationError("Invalid format. IDs must be integers.")
 
     # We override the get_queryset method to return only the recipes that belong to the authenticated user.
+
     def get_queryset(self):
         """Retrieve the recipes for the authenticated user."""
         tags = self.request.query_params.get("tags")
