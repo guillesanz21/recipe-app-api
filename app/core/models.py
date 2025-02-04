@@ -89,7 +89,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField('Tag')
     ingredients = models.ManyToManyField('Ingredient')
     # The upload_to argument specifies the directory to which the file is uploaded
-    iamge = models.ImageField(null=True, upload_to=recipe_image_file_path)
+    image = models.ImageField(null=True, upload_to=recipe_image_file_path)
 
     def __str__(self):
         return self.title
