@@ -1,7 +1,7 @@
 """
 Views for the recipe APIs.
 """
-
+from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter, OpenApiTypes
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,6 +13,23 @@ from recipe import serializers
 
 
 # * RECIPE VIEWSET
+# extend_schema_view is a decorator that allows us to add information to the schema.
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='tags',
+                type=OpenApiTypes.STR,
+                description="Comma separated list of tags to filter by.",
+            ),
+            OpenApiParameter(
+                name='ingredients',
+                type=OpenApiTypes.STR,
+                description="Comma separated list of ingredients to filter by.",
+            ),
+        ]
+    )
+)
 class RecipeViewSet(viewsets.ModelViewSet):
     """View for manage recipe APIs."""
 
@@ -23,11 +40,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]  # Tells Django to use TokenAuthentication for this view.
     permission_classes = [IsAuthenticated]  # Tells Django to use IsAuthenticated for this view.
 
+    def _params_to_ints(self, qs):
+        """Convert a list of strings to integers."""
+        # "1,2,3" -> [1, 2, 3]
+        return [int(str_id) for str_id in qs.split(",")]
+
     # We override the get_queryset method to return only the recipes that belong to the authenticated user.
     def get_queryset(self):
         """Retrieve the recipes for the authenticated user."""
+        tags = self.request.query_params.get("tags")
+        ingredients = self.request.query_params.get("ingredients")
+        queryset = self.queryset
+        if tags:
+            tag_ids = self._params_to_ints(tags)
+            # This syntax allows us to filter related fields on a database table. The syntax works as follows:
+            # tags is the related field we want to filter on.
+            # __id is the field we want to filter on.
+            # __in is the filter we want to apply.
+            queryset = queryset.filter(tags__id__in=tag_ids)
+        if ingredients:
+            ingredient_ids = self._params_to_ints(ingredients)
+            queryset = queryset.filter(ingredients__id__in=ingredient_ids)
+
         auth_user = self.request.user  # Retrieve the authenticated user.
-        return self.queryset.filter(user=auth_user).order_by("-id")
+        return queryset.filter(user=auth_user).order_by("-id").distinct()
 
     # We override the get_serializer_class method to return the appropriate serializer class for the request.
     # We need different serializers for list and detail views, for example.
