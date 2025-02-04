@@ -99,6 +99,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
 # * TAG AND INGREDIENT VIEWSETS
 # ! The mixins provide the actions that can be performed on the view.
 # The order of the mixins is important.
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='assigned_only',
+                type=OpenApiTypes.INT,
+                enum=[0, 1],
+                description="Filter by items assigned to recipes.",
+            ),
+        ]
+    )
+)
 class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
                             mixins.UpdateModelMixin,
                             mixins.ListModelMixin,
@@ -109,7 +121,15 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
 
     def get_queryset(self):
         """Filter queryset to authenticated user."""
-        return self.queryset.filter(user=self.request.user).order_by("-name")
+        assigned_only = bool(  # Convert the int to a boolean.
+            int(self.request.query_params.get("assigned_only", 0))  # Default value is 0.
+        )
+        queryset = self.queryset
+        if assigned_only:
+            # recipe is the related field we want to filter on, and __isnull is the filter we want to apply
+            queryset = queryset.filter(recipe__isnull=False)
+
+        return queryset.filter(user=self.request.user).order_by("-name").distinct()
 
 
 class TagViewSet(BaseRecipeAttrViewSet):
