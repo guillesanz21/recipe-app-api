@@ -14,6 +14,7 @@ router = DefaultRouter()
 # and since we are using the ModelViewSet, it will autogenerate the urls for the list, create, update, delete, etc.
 router.register('recipes', views.RecipeViewSet)
 router.register('tags', views.TagViewSet)
+router.register('ingredients', views.IngredientViewSet)
 
 app_name = 'recipe'
 
