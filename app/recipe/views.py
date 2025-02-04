@@ -41,36 +41,46 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-# * TAG VIEWSET
+# * TAG AND INGREDIENT VIEWSETS
 # ! The mixins provide the actions that can be performed on the view.
 # The order of the mixins is important.
-class TagViewSet(mixins.DestroyModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.ListModelMixin,
-                 viewsets.GenericViewSet):
-    """Manage tags in the database."""
+class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.ListModelMixin,
+                            viewsets.GenericViewSet):
+    """Base viewset for recipe attributes."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        """Filter queryset to authenticated user."""
+        return self.queryset.filter(user=self.request.user).order_by("-name")
+
+
+class TagViewSet(BaseRecipeAttrViewSet):
+    """Manage tags in the database."""
     serializer_class = serializers.TagSerializer
     queryset = Tag.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        """Filter queryset to authenticated user."""
-        return self.queryset.filter(user=self.request.user).order_by("-name")
 
 
-class IngredientViewSet(mixins.DestroyModelMixin,
-                        mixins.UpdateModelMixin,
-                        mixins.ListModelMixin,
-                        viewsets.GenericViewSet):
+class IngredientViewSet(BaseRecipeAttrViewSet):
     """Manage ingredients in the database."""
-
     serializer_class = serializers.IngredientSerializer
     queryset = Ingredient.objects.all()  # What models we want to be managable by this view set.
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        """Filter queryset to authenticated user."""
-        return self.queryset.filter(user=self.request.user).order_by("-name")
+
+# Without refactor
+# class TagViewSet(mixins.DestroyModelMixin,
+#                  mixins.UpdateModelMixin,
+#                  mixins.ListModelMixin,
+#                  viewsets.GenericViewSet):
+#     """Manage tags in the database."""
+
+#     serializer_class = serializers.TagSerializer
+#     queryset = Tag.objects.all()
+#     authentication_classes = [TokenAuthentication]
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+#         """Filter queryset to authenticated user."""
+#         return self.queryset.filter(user=self.request.user).order_by("-name")
