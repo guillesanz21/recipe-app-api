@@ -1,4 +1,4 @@
-FROM python:3.9-alpine3.13
+FROM python:3.13-alpine3.21
 # Good practice to inform to other developers who created and mantains the container
 LABEL maintainer="guillesanz21"
 
