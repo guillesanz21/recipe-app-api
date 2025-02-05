@@ -13,6 +13,7 @@ services:
       - ./app:/usr/app
       - dev-static-data:/vol/web
     environment:
+      - ENV=development
       - DB_HOST=db
       - DB_NAME=devdb
       - DB_USER=devuser

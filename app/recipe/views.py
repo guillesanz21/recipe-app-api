@@ -124,8 +124,8 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
                             mixins.ListModelMixin,
                             viewsets.GenericViewSet):
     """Base viewset for recipe attributes."""
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """Filter queryset to authenticated user."""
@@ -137,7 +137,8 @@ class BaseRecipeAttrViewSet(mixins.DestroyModelMixin,
             # recipe is the related field we want to filter on, and __isnull is the filter we want to apply
             queryset = queryset.filter(recipe__isnull=False)
 
-        return queryset.filter(user=self.request.user).order_by("-name").distinct()
+        return queryset.filter().order_by("-name").distinct()
+        # return queryset.filter(user=self.request.user).order_by("-name").distinct()
 
 
 class TagViewSet(BaseRecipeAttrViewSet):
