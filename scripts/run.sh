@@ -5,7 +5,6 @@ set -e # -e flag will cause the script to exit immediately if a simple command e
 python manage.py wait_for_db
 python manage.py collectstatic --noinput # collect all static files into a single directory
 python manage.py migrate
-python manage.py runserver
 
 # --socket :9000: uWSGI will listen on port 9000
 # --workers 4: uWSGI will start 4 worker processes
